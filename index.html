@@ -319,13 +319,13 @@
 
   <!-- Photo picker -->
   <div id="photo-area">
-    <div class="photo-drop" id="photo-drop" onclick="document.getElementById('camera-file').click()">
+    <label for="camera-file" class="photo-drop" id="photo-drop" style="cursor:pointer;">
       <div class="drop-hint">
         <div class="drop-icon">📷</div>
         <div class="drop-text">Tap to open your camera<br>or choose from your photo library</div>
       </div>
-    </div>
-    <input type="file" accept="image/*" id="camera-file" onchange="handlePhotoSelected(event)">
+    </label>
+    <input type="file" accept="image/*" id="camera-file" onchange="handlePhotoSelected(event)" style="display:none;">
 
     <!-- shown after photo selected -->
     <div class="cam-actions" id="cam-actions">
@@ -334,7 +334,7 @@
         <p>Drop your photo in the shared Drive folder so it makes it into next year's video!</p>
         <button class="btn-drive" onclick="openDrive()">📁 Open Drive Folder</button>
       </div>
-      <button class="btn-retake" onclick="document.getElementById('camera-file').click()">Choose a different photo</button>
+      <label for="camera-file" class="btn-retake" style="display:block;text-align:center;cursor:pointer;">Choose a different photo</label>
     </div>
   </div>
 
@@ -440,6 +440,14 @@ function boot() {
   document.getElementById('screen-welcome').classList.remove('active');
   document.getElementById('app-header').style.display = 'flex';
   document.getElementById('nav-tabs').style.display = 'flex';
+  // Always write participant to Firebase so name is never undefined on leaderboard
+  if (fbReady && me) {
+    db.ref('summit_snaps/participants/' + me.id).once('value').then(snap => {
+      if (!snap.exists()) {
+        db.ref('summit_snaps/participants/' + me.id).set({ name: me.name, score: me.score || 0 });
+      }
+    });
+  }
   renderAllCards();
   listenMyProgress();
   listenLeaderboard();
@@ -497,8 +505,8 @@ function openCamera(id) {
   document.getElementById('cam-pts-tag').innerHTML =
     '<span class="pts-chip chip-' + p.pts + '">' + p.pts + ' pts</span>';
   document.getElementById('cam-pts-inline').textContent = p.pts;
-  document.getElementById('photo-drop').innerHTML =
-    '<div class="drop-hint"><div class="drop-icon">📷</div>' +
+  const dropEl = document.getElementById('photo-drop');
+  dropEl.innerHTML = '<div class="drop-hint"><div class="drop-icon">📷</div>' +
     '<div class="drop-text">Tap to open your camera<br>or choose from your photo library</div></div>';
   document.getElementById('cam-actions').style.display = 'none';
   document.getElementById('claimed-box').style.display = 'none';
@@ -566,7 +574,10 @@ function listenLeaderboard() {
   if (!fbReady) return;
   db.ref('summit_snaps/participants').orderByChild('score').on('value', snap => {
     const rows = [];
-    snap.forEach(c => rows.unshift({ name: c.val().name, score: c.val().score || 0 }));
+    snap.forEach(c => {
+      const v = c.val();
+      if (v && v.name) rows.unshift({ name: v.name, score: v.score || 0 });
+    });
     const el = document.getElementById('lb-list');
     if (!rows.length) {
       el.innerHTML = '<div class="empty-state">No snaps claimed yet.<br>Be the first to earn points!</div>';
