@@ -1,0 +1,609 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Summit Snaps</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Lora:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --parchment: #F4ECD8;
+      --parchment-dark: #D9C9A8;
+      --wood: #2C1A0E;
+      --wood-light: #3E2412;
+      --burgundy: #7D1C1C;
+      --burgundy-light: #9B2626;
+      --gold: #C4952A;
+      --gold-light: #E8C86A;
+      --ink: #2C1810;
+      --ink-light: #6B4C3B;
+      --paper: #FDFAF3;
+      --stamp-green: #2D5016;
+      --rule: #C9B99A;
+      --drive-blue: #1967D2;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+    html, body { height: 100%; }
+    body {
+      font-family: 'Lora', Georgia, serif;
+      background: var(--parchment);
+      color: var(--ink);
+      min-height: 100vh;
+      max-width: 480px;
+      margin: 0 auto;
+      overflow-x: hidden;
+    }
+
+    /* HEADER */
+    .app-header {
+      background: var(--wood);
+      padding: 14px 18px;
+      display: none;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      border-bottom: 2px solid var(--gold);
+    }
+    .header-left { display: flex; flex-direction: column; }
+    .app-title { font-family: 'Playfair Display', serif; font-size: 22px; color: var(--gold); font-weight: 700; letter-spacing: 0.03em; line-height: 1.1; }
+    .app-subtitle { font-size: 10px; color: var(--parchment-dark); font-style: italic; letter-spacing: 0.06em; margin-top: 2px; }
+    .score-badge { background: var(--burgundy); color: var(--gold-light); font-family: 'Playfair Display', serif; font-size: 22px; font-weight: 700; padding: 6px 14px; border-radius: 3px; text-align: center; line-height: 1.1; }
+    .score-badge small { display: block; font-size: 9px; font-family: 'Lora', serif; font-weight: 400; letter-spacing: 0.12em; text-transform: uppercase; opacity: 0.85; }
+
+    /* NAV */
+    .nav-tabs { display: none; background: var(--wood-light); border-bottom: 1px solid var(--gold); }
+    .nav-tab { flex: 1; padding: 10px 8px; text-align: center; font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; font-family: 'Lora', serif; color: var(--parchment-dark); cursor: pointer; border: none; background: none; border-bottom: 2px solid transparent; }
+    .nav-tab.active { color: var(--gold); border-bottom-color: var(--gold); }
+
+    /* SCREENS */
+    .screen { display: none; }
+    .screen.active { display: block; }
+
+    /* WELCOME */
+    #screen-welcome { padding: 32px 20px; }
+    .welcome-masthead { text-align: center; margin-bottom: 28px; }
+    .book-icon { width: 72px; height: 72px; background: var(--burgundy); border-radius: 4px; margin: 0 auto 16px; display: flex; align-items: center; justify-content: center; font-size: 36px; box-shadow: 3px 3px 0 var(--wood); }
+    .welcome-masthead h1 { font-family: 'Playfair Display', serif; font-size: 32px; color: var(--burgundy); font-weight: 700; margin-bottom: 4px; }
+    .welcome-masthead .tagline { font-size: 13px; color: var(--ink-light); font-style: italic; line-height: 1.5; }
+    .library-card { background: var(--paper); border: 1px solid var(--rule); border-radius: 2px; padding: 24px 22px; box-shadow: 3px 3px 0 var(--parchment-dark); position: relative; }
+    .library-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 6px; background: var(--burgundy); border-radius: 2px 2px 0 0; }
+    .library-card h3 { font-family: 'Playfair Display', serif; font-size: 15px; color: var(--ink-light); margin-bottom: 12px; padding-top: 8px; text-align: center; letter-spacing: 0.05em; }
+    .card-rule { border: none; border-top: 1px solid var(--rule); margin: 14px 0; }
+    .welcome-desc { font-size: 13px; color: var(--ink-light); font-style: italic; line-height: 1.7; text-align: center; margin-bottom: 20px; }
+    .field-label { font-size: 10px; text-transform: uppercase; letter-spacing: 0.14em; color: var(--ink-light); margin-bottom: 6px; display: block; }
+    .text-input { width: 100%; padding: 12px 14px; font-family: 'Lora', serif; font-size: 16px; border: 1px solid var(--rule); border-radius: 2px; background: var(--parchment); color: var(--ink); margin-bottom: 14px; border-bottom: 2px solid var(--parchment-dark); }
+    .text-input:focus { outline: none; border-bottom-color: var(--gold); background: #fff; }
+    .btn-primary { width: 100%; padding: 15px; background: var(--burgundy); color: var(--gold-light); font-family: 'Playfair Display', serif; font-size: 16px; font-weight: 600; border: none; border-radius: 2px; cursor: pointer; letter-spacing: 0.05em; box-shadow: 2px 2px 0 var(--wood); }
+    .btn-primary:active { transform: translate(1px,1px); box-shadow: 1px 1px 0 var(--wood); }
+    .footer-note { text-align: center; font-size: 11px; color: var(--ink-light); font-style: italic; margin-top: 20px; line-height: 1.6; }
+
+    /* DRIVE BANNER */
+    .drive-banner {
+      background: #E8F0FE;
+      border: 1px solid #A8C7FA;
+      border-radius: 2px;
+      padding: 11px 14px;
+      margin: 0 14px 14px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .drive-banner-text { flex: 1; font-size: 12px; color: #1a3a6b; line-height: 1.5; }
+    .drive-banner-text strong { font-weight: 500; display: block; margin-bottom: 2px; }
+    .btn-drive-sm {
+      background: var(--drive-blue);
+      color: #fff;
+      font-family: 'Lora', serif;
+      font-size: 11px;
+      font-weight: 500;
+      padding: 7px 11px;
+      border-radius: 2px;
+      border: none;
+      cursor: pointer;
+      white-space: nowrap;
+      flex-shrink: 0;
+      letter-spacing: 0.02em;
+    }
+
+    /* CHALLENGES */
+    #screen-challenges { padding: 0 0 32px; }
+    .challenges-inner { padding: 16px 14px 0; }
+    .section-head { display: flex; align-items: center; gap: 8px; margin: 18px 0 10px; }
+    .section-head:first-child { margin-top: 0; }
+    .section-label { font-family: 'Playfair Display', serif; font-size: 11px; text-transform: uppercase; letter-spacing: 0.14em; white-space: nowrap; }
+    .label-10 { color: #085041; }
+    .label-25 { color: #0C447C; }
+    .label-50 { color: #633806; }
+    .label-100 { color: var(--burgundy); }
+    .section-rule { flex: 1; height: 1px; background: var(--rule); }
+
+    .challenge-card { background: var(--paper); border: 1px solid var(--rule); border-left: 4px solid var(--rule); border-radius: 2px; padding: 11px 12px 11px 13px; margin-bottom: 7px; display: flex; align-items: flex-start; gap: 10px; cursor: pointer; transition: background 0.1s; }
+    .challenge-card:active { background: var(--parchment); }
+    .card-10 { border-left-color: #1D9E75; }
+    .card-25 { border-left-color: #378ADD; }
+    .card-50 { border-left-color: #EF9F27; }
+    .card-100 { border-left-color: var(--burgundy); }
+    .challenge-card.done { opacity: 0.55; }
+
+    .card-num { font-family: 'Playfair Display', serif; font-size: 16px; font-weight: 700; color: var(--rule); min-width: 22px; margin-top: 1px; line-height: 1; }
+    .card-body { flex: 1; }
+    .card-text { font-size: 13px; line-height: 1.5; color: var(--ink); margin-bottom: 5px; }
+    .pts-chip { font-size: 10px; font-family: 'Lora', serif; font-weight: 500; padding: 2px 8px; border-radius: 2px; display: inline-block; letter-spacing: 0.04em; }
+    .chip-10 { background: #E1F5EE; color: #085041; }
+    .chip-25 { background: #E6F1FB; color: #0C447C; }
+    .chip-50 { background: #FAEEDA; color: #633806; }
+    .chip-100 { background: #FBEAF0; color: #72243E; }
+    .done-stamp { width: 32px; height: 32px; border: 2px solid var(--stamp-green); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: var(--stamp-green); font-size: 15px; transform: rotate(-14deg); flex-shrink: 0; margin-top: 2px; }
+
+    /* CAMERA */
+    #screen-camera { padding: 16px 16px 32px; }
+    .back-btn { display: flex; align-items: center; gap: 5px; font-size: 13px; color: var(--ink-light); cursor: pointer; margin-bottom: 16px; background: none; border: none; font-family: 'Lora', serif; padding: 0; font-style: italic; }
+    .prompt-banner { background: var(--paper); border: 1px solid var(--rule); border-left: 4px solid var(--burgundy); border-radius: 2px; padding: 14px 16px; margin-bottom: 16px; }
+    .prompt-banner-pts { margin-bottom: 8px; }
+    .prompt-banner-text { font-size: 14px; line-height: 1.6; font-style: italic; color: var(--ink); }
+
+    .photo-drop { background: var(--paper); border: 2px dashed var(--rule); border-radius: 3px; min-height: 200px; display: flex; flex-direction: column; align-items: center; justify-content: center; margin-bottom: 14px; cursor: pointer; position: relative; overflow: hidden; text-align: center; }
+    .photo-drop img { width: 100%; height: 100%; object-fit: cover; position: absolute; inset: 0; }
+    .drop-hint { padding: 24px 20px; }
+    .drop-icon { font-size: 40px; margin-bottom: 10px; }
+    .drop-text { font-size: 13px; color: var(--ink-light); font-style: italic; line-height: 1.6; }
+    #camera-file { display: none; }
+
+    /* action buttons */
+    .cam-actions { display: none; }
+    .btn-claim {
+      width: 100%;
+      padding: 16px;
+      background: var(--stamp-green);
+      color: #fff;
+      font-family: 'Playfair Display', serif;
+      font-size: 17px;
+      font-weight: 600;
+      border: none;
+      border-radius: 2px;
+      cursor: pointer;
+      letter-spacing: 0.04em;
+      margin-bottom: 10px;
+      box-shadow: 2px 2px 0 #1a3009;
+    }
+    .btn-claim:active { transform: translate(1px,1px); box-shadow: 1px 1px 0 #1a3009; }
+
+    .drive-submit-box {
+      background: #E8F0FE;
+      border: 1px solid #A8C7FA;
+      border-radius: 2px;
+      padding: 14px 16px;
+      margin-bottom: 10px;
+      text-align: center;
+    }
+    .drive-submit-box p { font-size: 12px; color: #1a3a6b; margin-bottom: 10px; line-height: 1.6; }
+    .btn-drive {
+      display: inline-block;
+      background: var(--drive-blue);
+      color: #fff;
+      font-family: 'Lora', serif;
+      font-size: 13px;
+      font-weight: 500;
+      padding: 10px 20px;
+      border-radius: 2px;
+      border: none;
+      cursor: pointer;
+      text-decoration: none;
+      letter-spacing: 0.02em;
+    }
+    .btn-retake { width: 100%; padding: 11px; background: transparent; color: var(--ink-light); font-family: 'Lora', serif; font-size: 13px; font-style: italic; border: 1px solid var(--rule); border-radius: 2px; cursor: pointer; margin-top: 6px; }
+
+    /* claimed state */
+    .claimed-box { background: #EAF3DE; border: 1px solid #97C459; border-radius: 2px; padding: 20px 16px; text-align: center; display: none; }
+    .claimed-box .claimed-icon { font-size: 40px; margin-bottom: 10px; }
+    .claimed-box p { font-size: 14px; color: #27500A; font-style: italic; line-height: 1.6; margin-bottom: 14px; }
+    .btn-back-challenges { width: 100%; padding: 13px; background: var(--burgundy); color: var(--gold-light); font-family: 'Playfair Display', serif; font-size: 15px; font-weight: 600; border: none; border-radius: 2px; cursor: pointer; letter-spacing: 0.04em; }
+
+    /* LEADERBOARD */
+    #screen-leaderboard { padding: 16px 14px 32px; }
+    .lb-card { background: var(--paper); border: 1px solid var(--rule); border-radius: 2px; padding: 13px 16px; margin-bottom: 8px; display: flex; align-items: center; gap: 14px; }
+    .lb-rank { font-family: 'Playfair Display', serif; font-size: 24px; font-weight: 700; min-width: 32px; color: var(--rule); }
+    .lb-rank.r1 { color: var(--gold); }
+    .lb-rank.r2 { color: #8A9BA8; }
+    .lb-rank.r3 { color: #A0633A; }
+    .lb-name { flex: 1; font-size: 15px; color: var(--ink); font-weight: 500; }
+    .lb-score { font-family: 'Playfair Display', serif; font-size: 22px; font-weight: 700; color: var(--burgundy); }
+    .lb-pts-label { font-size: 10px; color: var(--ink-light); font-style: italic; text-align: right; }
+    .empty-state { text-align: center; padding: 48px 20px; color: var(--ink-light); font-style: italic; font-size: 14px; line-height: 1.7; }
+
+    /* TOAST */
+    .toast { position: fixed; bottom: 28px; left: 50%; transform: translateX(-50%); background: var(--wood); color: var(--gold); font-family: 'Playfair Display', serif; font-size: 14px; padding: 12px 22px; border-radius: 3px; z-index: 999; display: none; white-space: nowrap; border-top: 2px solid var(--gold); max-width: 90vw; text-align: center; }
+
+    #screen-challenges {
+      background-image: repeating-linear-gradient(transparent, transparent 27px, rgba(180,155,110,0.15) 27px, rgba(180,155,110,0.15) 28px);
+      background-attachment: local;
+    }
+  </style>
+</head>
+<body>
+
+<!-- ══ HEADER ══ -->
+<div class="app-header" id="app-header">
+  <div class="header-left">
+    <div class="app-title">Summit Snaps</div>
+    <div class="app-subtitle">3rd Annual MC Summit · Wilkesboro, NC</div>
+  </div>
+  <div class="score-badge">
+    <span id="header-score">0</span>
+    <small>points</small>
+  </div>
+</div>
+
+<!-- ══ NAV ══ -->
+<div class="nav-tabs" id="nav-tabs">
+  <button class="nav-tab active" onclick="showTab('challenges')">📋 Challenges</button>
+  <button class="nav-tab" onclick="showTab('leaderboard')">🏆 Leaderboard</button>
+</div>
+
+<!-- ══════════════════════════════════════ -->
+<!-- WELCOME                               -->
+<!-- ══════════════════════════════════════ -->
+<div id="screen-welcome" class="screen active">
+  <div style="padding: 32px 20px;">
+    <div class="welcome-masthead">
+      <div class="book-icon">📚</div>
+      <h1>Summit Snaps</h1>
+      <p class="tagline">3rd Annual Media Coordinator Summit<br>Country Roads &amp; Sweet Traditions · 2026</p>
+    </div>
+    <div class="library-card">
+      <h3>Patron Check-In</h3>
+      <hr class="card-rule">
+      <p class="welcome-desc">Complete photo challenges throughout the day, earn points, and climb the leaderboard. Every photo becomes part of next year's Summit video!</p>
+      <hr class="card-rule">
+      <label class="field-label" for="name-input">Your full name</label>
+      <input type="text" id="name-input" class="text-input" placeholder="e.g. Tonya Denny" autocomplete="name" autocorrect="off">
+      <button class="btn-primary" onclick="joinChallenge()">Check Out Your Challenges →</button>
+    </div>
+    <p class="footer-note">Max possible score: 630 points<br>All photos collected for the 4th Annual Summit video</p>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════ -->
+<!-- CHALLENGES                            -->
+<!-- ══════════════════════════════════════ -->
+<div id="screen-challenges" class="screen">
+
+  <!-- Google Drive reminder banner -->
+  <div class="drive-banner" id="drive-banner" style="margin-top:14px;">
+    <div class="drive-banner-text">
+      <strong>📁 Drop your photos here</strong>
+      Tap to add your snaps to our shared Drive folder for the video!
+    </div>
+    <button class="btn-drive-sm" onclick="openDrive()">Open Drive</button>
+  </div>
+
+  <div class="challenges-inner">
+    <div class="section-head">
+      <span class="section-label label-10">10 pts — Easy snaps</span>
+      <span class="section-rule"></span>
+    </div>
+    <div id="list-10"></div>
+
+    <div class="section-head">
+      <span class="section-label label-25">25 pts — A little more effort</span>
+      <span class="section-rule"></span>
+    </div>
+    <div id="list-25"></div>
+
+    <div class="section-head">
+      <span class="section-label label-50">50 pts — Big moves</span>
+      <span class="section-rule"></span>
+    </div>
+    <div id="list-50"></div>
+
+    <div class="section-head">
+      <span class="section-label label-100">100 pts — Grand Challenges</span>
+      <span class="section-rule"></span>
+    </div>
+    <div id="list-100"></div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════ -->
+<!-- CAMERA / SUBMISSION                   -->
+<!-- ══════════════════════════════════════ -->
+<div id="screen-camera" class="screen">
+  <button class="back-btn" onclick="showTab('challenges')">← Back to challenges</button>
+
+  <div class="prompt-banner">
+    <div class="prompt-banner-pts" id="cam-pts-tag"></div>
+    <div class="prompt-banner-text" id="cam-text"></div>
+  </div>
+
+  <!-- Photo picker -->
+  <div id="photo-area">
+    <div class="photo-drop" id="photo-drop" onclick="document.getElementById('camera-file').click()">
+      <div class="drop-hint">
+        <div class="drop-icon">📷</div>
+        <div class="drop-text">Tap to open your camera<br>or choose from your photo library</div>
+      </div>
+    </div>
+    <input type="file" accept="image/*" capture="environment" id="camera-file" onchange="handlePhotoSelected(event)">
+
+    <!-- shown after photo selected -->
+    <div class="cam-actions" id="cam-actions">
+      <button class="btn-claim" onclick="claimPoints()">I Snapped It! — Claim <span id="cam-pts-inline">0</span> pts ✓</button>
+      <div class="drive-submit-box">
+        <p>Drop your photo in the shared Drive folder so it makes it into next year's video!</p>
+        <button class="btn-drive" onclick="openDrive()">📁 Open Drive Folder</button>
+      </div>
+      <button class="btn-retake" onclick="document.getElementById('camera-file').click()">Choose a different photo</button>
+    </div>
+  </div>
+
+  <!-- shown after claiming -->
+  <div class="claimed-box" id="claimed-box">
+    <div class="claimed-icon">📚</div>
+    <p>Points claimed! Don't forget to drop your photo in the Drive folder so it makes the video.</p>
+    <button class="btn-drive" style="display:block;width:100%;margin-bottom:12px;" onclick="openDrive()">📁 Open Drive Folder</button>
+    <button class="btn-back-challenges" onclick="showTab('challenges')">← Back to Challenges</button>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════ -->
+<!-- LEADERBOARD                           -->
+<!-- ══════════════════════════════════════ -->
+<div id="screen-leaderboard" class="screen">
+  <div class="section-head" style="margin-top:0;">
+    <span class="section-label" style="color:var(--burgundy);">Live standings</span>
+    <span class="section-rule"></span>
+  </div>
+  <div id="lb-list">
+    <div class="empty-state">No snaps claimed yet.<br>Be the first to earn points!</div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<!-- ══ FIREBASE ══ -->
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+
+<script>
+// ================================================================
+//  GOOGLE DRIVE FOLDER LINK
+//  Replace the URL below with your shared Summit Snaps folder link
+// ================================================================
+const DRIVE_URL = "https://drive.google.com/drive/folders/14dNMxBKUyDfsoPqYofPOyfsMzl5vrrbp?usp=sharing";
+
+// ================================================================
+//  FIREBASE CONFIG — already connected to Game On Giveaway project
+// ================================================================
+const firebaseConfig = {
+  apiKey:        "AIzaSyCcB6t83cfOULUXixRcYWl9vsBdADWxn3s",
+  authDomain:    "game-on-giveaway.firebaseapp.com",
+  databaseURL:   "https://game-on-giveaway-default-rtdb.firebaseio.com",
+  projectId:     "game-on-giveaway",
+  storageBucket: "game-on-giveaway.appspot.com"
+};
+// ================================================================
+
+// ── PROMPTS ─────────────────────────────────────────────────────
+const PROMPTS = [
+  { id:1,  pts:10,  text:"Snap a selfie with someone you've never met before today" },
+  { id:2,  pts:10,  text:"Find someone wearing something book or library themed and snap a photo with them" },
+  { id:3,  pts:10,  text:"Snap a picture of the best swag or freebie you scored today" },
+  { id:4,  pts:10,  text:"Capture a candid moment during a presentation or session" },
+  { id:5,  pts:10,  text:"Snap a photo holding a book on display from the vendor hall or in a session" },
+  { id:6,  pts:10,  text:"Find someone from the same region as you — snap it" },
+  { id:7,  pts:10,  text:"Snap the most delicious-looking food or treat you spot" },
+  { id:8,  pts:10,  text:"Capture two people deeply engaged in conversation" },
+  { id:9,  pts:25,  text:"Snap a genuine moment of laughter" },
+  { id:10, pts:25,  text:"Snap a photo with someone who has been a media coordinator longer than you" },
+  { id:11, pts:25,  text:"Snap a full table squad selfie — everyone in frame" },
+  { id:12, pts:25,  text:"Snap something that represents why you love being a media coordinator" },
+  { id:13, pts:25,  text:"Find someone wearing NCSLMA swag and snap a photo with them" },
+  { id:14, pts:50,  text:"Get a group photo with 5+ people from 5 different counties" },
+  { id:15, pts:50,  text:"Capture a behind-the-scenes moment nobody else is photographing" },
+  { id:16, pts:100, text:"Get a photo with Lester Laminack AND have him write one word that describes media coordinators on a sticky note — both must be in the frame" },
+  { id:17, pts:100, text:"Gather one media coordinator from every NCSLMA region represented at the summit into a single group photo — all regions, one frame" },
+];
+
+// ── STATE ────────────────────────────────────────────────────────
+let db, fbReady = false;
+let me = null;
+let done = {};
+let activeId = null;
+
+// ── INIT FIREBASE ────────────────────────────────────────────────
+try {
+  firebase.initializeApp(firebaseConfig);
+  db = firebase.database();
+  fbReady = true;
+} catch(e) { console.warn('Firebase init failed:', e); }
+
+// ── RESTORE SESSION ──────────────────────────────────────────────
+window.addEventListener('DOMContentLoaded', () => {
+  const saved = localStorage.getItem('summit_snaps_me');
+  if (saved) { me = JSON.parse(saved); boot(); }
+});
+
+// ── JOIN ─────────────────────────────────────────────────────────
+function joinChallenge() {
+  const name = document.getElementById('name-input').value.trim();
+  if (!name) { toast('Please enter your name first!'); return; }
+  const id = 'p_' + Date.now() + '_' + Math.random().toString(36).slice(2,6);
+  me = { id, name, score: 0 };
+  localStorage.setItem('summit_snaps_me', JSON.stringify(me));
+  if (fbReady) db.ref('summit_snaps/participants/' + id).set({ name, score: 0 });
+  boot();
+}
+
+function boot() {
+  document.getElementById('screen-welcome').classList.remove('active');
+  document.getElementById('app-header').style.display = 'flex';
+  document.getElementById('nav-tabs').style.display = 'flex';
+  renderAllCards();
+  listenMyProgress();
+  listenLeaderboard();
+  showTab('challenges');
+}
+
+// ── RENDER ───────────────────────────────────────────────────────
+function renderAllCards() {
+  [10,25,50,100].forEach(pts => {
+    const el = document.getElementById('list-' + pts);
+    el.innerHTML = '';
+    PROMPTS.filter(p => p.pts === pts).forEach(p => el.appendChild(makeCard(p)));
+  });
+  document.getElementById('header-score').textContent = me.score || 0;
+}
+
+function makeCard(p) {
+  const isDone = !!done[p.id];
+  const div = document.createElement('div');
+  div.id = 'card-' + p.id;
+  div.className = 'challenge-card card-' + p.pts + (isDone ? ' done' : '');
+  div.onclick = () => openCamera(p.id);
+  div.innerHTML =
+    '<span class="card-num">' + p.id + '</span>' +
+    '<div class="card-body">' +
+      '<div class="card-text">' + p.text + '</div>' +
+      '<span class="pts-chip chip-' + p.pts + '">' + p.pts + ' pts</span>' +
+    '</div>' +
+    (isDone ? '<div class="done-stamp">✓</div>' : '');
+  return div;
+}
+
+// ── LISTEN: MY PROGRESS ──────────────────────────────────────────
+function listenMyProgress() {
+  if (!fbReady) return;
+  db.ref('summit_snaps/claims')
+    .orderByChild('participantId').equalTo(me.id)
+    .on('value', snap => {
+      done = {};
+      let score = 0;
+      snap.forEach(c => { const v = c.val(); done[v.promptId] = true; score += v.pts; });
+      me.score = score;
+      localStorage.setItem('summit_snaps_me', JSON.stringify(me));
+      document.getElementById('header-score').textContent = score;
+      renderAllCards();
+    });
+}
+
+// ── CAMERA ───────────────────────────────────────────────────────
+function openCamera(id) {
+  if (done[id]) { toast('Already snapped! Each challenge is one photo.'); return; }
+  activeId = id;
+  const p = PROMPTS.find(x => x.id === id);
+  document.getElementById('cam-text').textContent = p.text;
+  document.getElementById('cam-pts-tag').innerHTML =
+    '<span class="pts-chip chip-' + p.pts + '">' + p.pts + ' pts</span>';
+  document.getElementById('cam-pts-inline').textContent = p.pts;
+  document.getElementById('photo-drop').innerHTML =
+    '<div class="drop-hint"><div class="drop-icon">📷</div>' +
+    '<div class="drop-text">Tap to open your camera<br>or choose from your photo library</div></div>';
+  document.getElementById('cam-actions').style.display = 'none';
+  document.getElementById('claimed-box').style.display = 'none';
+  document.getElementById('photo-area').style.display = 'block';
+  document.getElementById('camera-file').value = '';
+  showTab('camera');
+}
+
+function handlePhotoSelected(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = ev => {
+    const drop = document.getElementById('photo-drop');
+    drop.innerHTML = '<img src="' + ev.target.result + '" alt="preview">';
+    document.getElementById('cam-actions').style.display = 'block';
+  };
+  reader.readAsDataURL(file);
+}
+
+// ── CLAIM POINTS (no upload needed) ─────────────────────────────
+function claimPoints() {
+  if (activeId === null || done[activeId]) return;
+  const p = PROMPTS.find(x => x.id === activeId);
+
+  // Record locally right away
+  done[activeId] = true;
+  me.score = (me.score || 0) + p.pts;
+  localStorage.setItem('summit_snaps_me', JSON.stringify(me));
+  document.getElementById('header-score').textContent = me.score;
+  renderAllCards();
+
+  // Push to Firebase (database only, no storage)
+  if (fbReady) {
+    const claimRef = db.ref('summit_snaps/claims').push();
+    claimRef.set({
+      participantId:   me.id,
+      participantName: me.name,
+      promptId:        activeId,
+      promptText:      p.text,
+      pts:             p.pts,
+      ts:              Date.now()
+    });
+    db.ref('summit_snaps/participants/' + me.id + '/score').set(me.score);
+  }
+
+  // Show claimed state
+  document.getElementById('cam-actions').style.display = 'none';
+  document.getElementById('photo-area').style.display = 'none';
+  document.getElementById('claimed-box').style.display = 'block';
+  toast('+' + p.pts + ' pts earned! 📚');
+}
+
+// ── DRIVE ────────────────────────────────────────────────────────
+function openDrive() {
+  if (DRIVE_URL === "PASTE_YOUR_GOOGLE_DRIVE_FOLDER_LINK_HERE") {
+    toast('Drive folder link not set up yet!');
+    return;
+  }
+  window.open(DRIVE_URL, '_blank');
+}
+
+// ── LEADERBOARD ──────────────────────────────────────────────────
+function listenLeaderboard() {
+  if (!fbReady) return;
+  db.ref('summit_snaps/participants').orderByChild('score').on('value', snap => {
+    const rows = [];
+    snap.forEach(c => rows.unshift({ name: c.val().name, score: c.val().score || 0 }));
+    const el = document.getElementById('lb-list');
+    if (!rows.length) {
+      el.innerHTML = '<div class="empty-state">No snaps claimed yet.<br>Be the first to earn points!</div>';
+      return;
+    }
+    const rankClass = ['r1','r2','r3'];
+    el.innerHTML = rows.map((r,i) =>
+      '<div class="lb-card">' +
+        '<div class="lb-rank ' + (rankClass[i]||'') + '">' + (i+1) + '</div>' +
+        '<div class="lb-name">' + r.name + '</div>' +
+        '<div style="text-align:right;">' +
+          '<div class="lb-score">' + r.score + '</div>' +
+          '<div class="lb-pts-label">pts</div>' +
+        '</div>' +
+      '</div>'
+    ).join('');
+  });
+}
+
+// ── NAV ──────────────────────────────────────────────────────────
+function showTab(tab) {
+  ['challenges','camera','leaderboard'].forEach(t => {
+    document.getElementById('screen-' + t).classList.toggle('active', t === tab);
+  });
+  document.querySelectorAll('.nav-tab').forEach((btn,i) => {
+    btn.classList.toggle('active', ['challenges','leaderboard'][i] === tab);
+  });
+}
+
+// ── TOAST ────────────────────────────────────────────────────────
+function toast(msg) {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.style.display = 'block';
+  clearTimeout(el._t);
+  el._t = setTimeout(() => el.style.display = 'none', 2600);
+}
+</script>
+</body>
+</html>
