@@ -144,15 +144,10 @@
     .prompt-banner-pts { margin-bottom: 8px; }
     .prompt-banner-text { font-size: 14px; line-height: 1.6; font-style: italic; color: var(--ink); }
 
-    .photo-drop { background: var(--paper); border: 2px dashed var(--rule); border-radius: 3px; min-height: 200px; display: flex; flex-direction: column; align-items: center; justify-content: center; margin-bottom: 14px; cursor: pointer; position: relative; overflow: hidden; text-align: center; }
-    .photo-drop img { width: 100%; height: 100%; object-fit: cover; position: absolute; inset: 0; }
-    .drop-hint { padding: 24px 20px; }
     .drop-icon { font-size: 40px; margin-bottom: 10px; }
     .drop-text { font-size: 13px; color: var(--ink-light); font-style: italic; line-height: 1.6; }
-    #camera-file { display: none; }
 
     /* action buttons */
-    .cam-actions { display: none; }
     .btn-claim {
       width: 100%;
       padding: 16px;
@@ -373,32 +368,29 @@
     <div class="prompt-banner-text" id="cam-text"></div>
   </div>
 
-  <!-- Photo picker -->
+  <!-- Drive-first two-step flow -->
   <div id="photo-area">
-    <label for="camera-file" class="photo-drop" id="photo-drop" style="cursor:pointer;">
-      <div class="drop-hint">
-        <div class="drop-icon">📷</div>
-        <div class="drop-text">Tap to open your camera<br>or choose from your photo library</div>
-      </div>
-    </label>
-    <input type="file" accept="image/*" id="camera-file" onchange="handlePhotoSelected(event)" style="display:none;">
 
-    <!-- shown after photo selected -->
-    <div class="cam-actions" id="cam-actions">
-      <button class="btn-claim" onclick="claimPoints()">I Snapped It! — Claim <span id="cam-pts-inline">0</span> pts ✓</button>
-      <div class="drive-submit-box">
-        <p>Drop your photo in the shared Drive folder so it makes it into next year's video!</p>
-        <button class="btn-drive" onclick="openDrive()">📁 Open Drive Folder</button>
-      </div>
-      <label for="camera-file" class="btn-retake" style="display:block;text-align:center;cursor:pointer;">Choose a different photo</label>
+    <div class="drive-step-box">
+      <div class="step-num">Step 1 — Take your photo</div>
+      <p class="step-desc">Tap the button below to open the shared Drive folder. Tap the <strong>+</strong> button, take your photo, tap <strong>Use Photo</strong>, then tap <strong>Upload</strong>.</p>
+      <button class="btn-drive-lg" onclick="openDrive()">📁 Open Drive Folder to Upload Photo</button>
     </div>
+
+    <div class="divider-or">— then come back here —</div>
+
+    <div class="claim-step-box">
+      <div class="step-num">Step 2 — Claim your points</div>
+      <p class="step-desc">Once your photo is uploaded to Drive, tap below to earn your points!</p>
+      <button class="btn-claim" onclick="claimPoints()">I Snapped It! — Claim <span id="cam-pts-inline">0</span> pts ✓</button>
+    </div>
+
   </div>
 
   <!-- shown after claiming -->
   <div class="claimed-box" id="claimed-box">
     <div class="claimed-icon">📚</div>
-    <p>Points claimed! Don't forget to drop your photo in the Drive folder so it makes the video.</p>
-    <button class="btn-drive" style="display:block;width:100%;margin-bottom:12px;" onclick="openDrive()">📁 Open Drive Folder</button>
+    <p>Points claimed! Your photo will be part of next year's Summit video.</p>
     <button class="btn-back-challenges" onclick="showTab('challenges')">← Back to Challenges</button>
   </div>
 </div>
