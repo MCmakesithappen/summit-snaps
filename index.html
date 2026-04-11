@@ -213,6 +213,62 @@
     .lb-pts-label { font-size: 10px; color: var(--ink-light); font-style: italic; text-align: right; }
     .empty-state { text-align: center; padding: 48px 20px; color: var(--ink-light); font-style: italic; font-size: 14px; line-height: 1.7; }
 
+    /* DRIVE-FIRST STEP LAYOUT */
+    .drive-step-box {
+      background: #E8F0FE;
+      border: 1px solid #A8C7FA;
+      border-radius: 2px;
+      padding: 18px 16px;
+      margin-bottom: 12px;
+      text-align: center;
+    }
+    .claim-step-box {
+      background: var(--paper);
+      border: 1px solid var(--rule);
+      border-radius: 2px;
+      padding: 18px 16px;
+      text-align: center;
+    }
+    .step-num {
+      font-family: 'Playfair Display', serif;
+      font-size: 11px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--ink-light);
+      margin-bottom: 8px;
+      font-weight: 600;
+    }
+    .step-desc {
+      font-size: 13px;
+      color: var(--ink-light);
+      line-height: 1.65;
+      margin-bottom: 14px;
+      font-style: italic;
+    }
+    .step-desc strong { font-style: normal; font-weight: 500; color: var(--ink); }
+    .btn-drive-lg {
+      display: block;
+      background: var(--drive-blue);
+      color: #fff;
+      font-family: 'Lora', serif;
+      font-size: 15px;
+      font-weight: 500;
+      padding: 14px 20px;
+      border-radius: 2px;
+      border: none;
+      cursor: pointer;
+      text-decoration: none;
+      letter-spacing: 0.02em;
+    }
+    .btn-drive-lg:active { opacity: 0.88; }
+    .divider-or {
+      text-align: center;
+      font-size: 12px;
+      color: var(--ink-light);
+      font-style: italic;
+      margin: 10px 0;
+      letter-spacing: 0.06em;
+    }
     /* TOAST */
     .toast { position: fixed; bottom: 28px; left: 50%; transform: translateX(-50%); background: var(--wood); color: var(--gold); font-family: 'Playfair Display', serif; font-size: 14px; padding: 12px 22px; border-radius: 3px; z-index: 999; display: none; white-space: nowrap; border-top: 2px solid var(--gold); max-width: 90vw; text-align: center; }
 
@@ -505,27 +561,12 @@ function openCamera(id) {
   document.getElementById('cam-pts-tag').innerHTML =
     '<span class="pts-chip chip-' + p.pts + '">' + p.pts + ' pts</span>';
   document.getElementById('cam-pts-inline').textContent = p.pts;
-  const dropEl = document.getElementById('photo-drop');
-  dropEl.innerHTML = '<div class="drop-hint"><div class="drop-icon">📷</div>' +
-    '<div class="drop-text">Tap to open your camera<br>or choose from your photo library</div></div>';
-  document.getElementById('cam-actions').style.display = 'none';
   document.getElementById('claimed-box').style.display = 'none';
   document.getElementById('photo-area').style.display = 'block';
-  document.getElementById('camera-file').value = '';
   showTab('camera');
 }
 
-function handlePhotoSelected(e) {
-  const file = e.target.files[0];
-  if (!file) return;
-  const reader = new FileReader();
-  reader.onload = ev => {
-    const drop = document.getElementById('photo-drop');
-    drop.innerHTML = '<img src="' + ev.target.result + '" alt="preview">';
-    document.getElementById('cam-actions').style.display = 'block';
-  };
-  reader.readAsDataURL(file);
-}
+/* handlePhotoSelected removed — Drive-first flow */
 
 // ── CLAIM POINTS (no upload needed) ─────────────────────────────
 function claimPoints() {
